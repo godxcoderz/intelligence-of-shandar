@@ -1,17 +1,84 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>Upload Notes</title>
-<link rel="stylesheet" href="css/style.css" />
+  <meta charset="UTF-8">
+  <title>Upload Notes</title>
+  <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
+
 <section class="page">
-<h2>Upload Your Learning Material</h2>
-<form class="upload-box">
-<input type="file" multiple />
-<button type="submit">Upload</button>
-</form>
-<p>Supports Images, PDFs, and Videos</p>
+  <h2>Upload Your Learning Material</h2>
+
+  <div class="upload-box">
+    <input type="file" id="fileInput" multiple />
+    <button onclick="uploadToDrive()">Upload</button>
+    <p id="status"></p>
+  </div>
+
+  <p>Supports Images, PDFs, and Videos</p>
 </section>
+
+<!-- Google Auth Script -->
+<script src="https://accounts.google.com/gsi/client"></script>
+
+<script>
+/* ====== REPLACE THESE TWO ====== */
+const CLIENT_ID = "PASTE_YOUR_CLIENT_ID_HERE";
+const FOLDER_ID = "PASTE_YOUR_FOLDER_ID_HERE";
+/* =============================== */
+
+let accessToken = null;
+
+function uploadToDrive() {
+  const files = document.getElementById("fileInput").files;
+
+  if (!files.length) {
+    alert("Please select at least one file");
+    return;
+  }
+
+  google.accounts.oauth2.initTokenClient({
+    client_id: CLIENT_ID,
+    scope: 'https://www.googleapis.com/auth/drive.file',
+    callback: (tokenResponse) => {
+      accessToken = tokenResponse.access_token;
+      uploadFiles(files);
+    },
+  }).requestAccessToken();
+}
+
+function uploadFiles(files) {
+  document.getElementById("status").innerText = "Uploading...";
+
+  Array.from(files).forEach(file => {
+    const metadata = {
+      name: file.name,
+      parents: [FOLDER_ID]
+    };
+
+    const form = new FormData();
+    form.append("metadata", new Blob([JSON.stringify(metadata)], { type: "application/json" }));
+    form.append("file", file);
+
+    fetch("https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart", {
+      method: "POST",
+      headers: {
+        Authorization: "Bearer " + accessToken
+      },
+      body: form
+    })
+    .then(res => res.json())
+    .then(() => {
+      document.getElementById("status").innerText = "Upload successful!";
+    })
+    .catch(() => {
+      document.getElementById("status").innerText = "Upload failed!";
+    });
+  });
+}
+</script>
+
 </body>
 </html>
