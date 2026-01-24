@@ -3,8 +3,8 @@
 console.log("Intelligence of Shandar Loaded");
 <script src="https://accounts.google.com/gsi/client"></script>
 <script>
-const CLIENT_ID = "PASTE_CLIENT_ID";
-const FOLDER_ID = "PASTE_FOLDER_ID";
+const CLIENT_ID = "1099409130744-rc4oti4bbk8hsdo9oiu80ldhbfr837uj.apps.googleusercontent.com";
+const FOLDER_ID = "1GtCeRBo9-Pfppbq-jy2Mfrj-_29cKsoM?usp=sharing";
 let accessToken = null;
 
 function initAuth() {
@@ -55,3 +55,4 @@ function uploadToDrive() {
   });
 }
 </script>
+
